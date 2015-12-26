@@ -9,7 +9,7 @@
   </object>
   <template class="GonepassAppWindow" parent="GtkApplicationWindow">
     <property name="can_focus">False</property>
-    <property name="default_width">800</property>
+    <property name="default_width">798</property>
     <property name="default_height">600</property>
     <child>
       <object class="GtkOverlay" id="overlay1">
@@ -170,7 +170,6 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="padding">10</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
@@ -178,7 +177,6 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="padding">10</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
@@ -186,10 +184,7 @@
                   <object class="GtkScrolledWindow" id="scrolledwindow1">
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
-                    <property name="hscrollbar_policy">never</property>
                     <property name="shadow_type">in</property>
-                    <property name="min_content_width">400</property>
-                    <property name="min_content_height">1</property>
                     <child>
                       <object class="GtkViewport" id="viewport2">
                         <property name="visible">True</property>

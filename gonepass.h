@@ -5,6 +5,8 @@
 #include <gtk/gtk.h>
 #include <jansson.h>
 #include <openssl/evp.h>
+#include <uriparser/Uri.h>
+#include <liboath/oath.h>
 
 struct master_key {
     int level, key_len;

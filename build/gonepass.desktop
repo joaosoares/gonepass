@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=Gonepass
+Comment=1Password reader for Gnome
+Exec=/usr/local/bin/gonepass %F
+Icon=gonepass.png
+Terminal=false

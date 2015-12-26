@@ -1,0 +1,2 @@
+# Hashes of file build rules.
+03a3d5c939080d316b1b131c04e097e1 Resources.c
