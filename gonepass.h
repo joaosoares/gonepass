@@ -20,6 +20,12 @@ struct credentials_bag {
     int credentials_loaded;
 };
 
+typedef struct totp_struct {
+  GtkWidget * field;
+  char * secret;
+  size_t secretlen;
+} TotpInfo;
+
 #define GONEPASS_APP_TYPE (gonepass_app_get_type())
 #define GONEPASS_APP(obj) (G_TYPE_CHECK_INSTANCE_CAST((obj), GONEPASS_APP_TYPE, GonepassApp))
 

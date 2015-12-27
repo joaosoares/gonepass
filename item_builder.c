@@ -25,7 +25,23 @@ static void handle_reveal_button(GtkButton * button, gpointer data) {
 }
 
 static void handle_refresh_button(GtkButton * button, gpointer data) {
-  char * secret = (char *) data; // get the secret
+  TotpInfo * totp = (TotpInfo *) data; // get the secret
+  printf("secret is %ld, secretlen %ld\n", totp->secret, totp->secretlen);
+}
+
+static gint handle_totp_refresh(gpointer data) {
+  // TotpInfo * totp = (TotpInfo *) data;
+  GtkEntry * totp_field = GTK_ENTRY(((TotpInfo*)data)->field);
+  time_t now;
+  struct tm *tm;
+  double progress;
+
+  time(&now);
+  tm = localtime(&now);
+  progress = (tm->tm_sec % 30)/30.0;
+  printf("%ld, %.2f\n", now, progress);
+  gtk_entry_set_progress_fraction(totp_field, progress + 1.0/30.0); // to make bar go full
+  return TRUE;
 }
 
 static int get_totp_secret(const char * totp_uri, char ** secret, size_t * secretlen) {
@@ -68,30 +84,31 @@ static void process_single_field(
     GtkWidget * value_widget = gtk_entry_new();
     gtk_entry_set_text(GTK_ENTRY(value_widget), value);
     gtk_widget_set_hexpand(GTK_WIDGET(value_widget), TRUE);
-
     g_object_set(G_OBJECT(value_widget),
         "editable", FALSE,
         NULL
     );
-
+    TotpInfo totp;
     GtkWidget * copy_button = NULL, *reveal_button = NULL, *refresh_button = NULL;
 
     if(is_totp) {
-      struct TotpStruct {
-        GtkWidget * field;
-        char * secret;
-        size_t secretlen;
-      } totp;
+      TotpInfo test;
+      test.secret = strdup("buckle up buckaroo");
+      test.secretlen = 12;
+      printf("secret is %s, secretlen %ld, addresses are %ld and %ld\n", test.secret, test.secretlen, &test.secret, &test.secretlen);
       totp.field = gtk_entry_new();
+      g_object_set(G_OBJECT(totp.field),
+          "editable", FALSE,
+          NULL);
 
-      char * secret; size_t secretlen; char otp[10]; time_t now;
+      char otp[10]; time_t now;
       get_totp_secret(value, &totp.secret, &totp.secretlen);
       time(&now);
       oath_init();    /* Now let's use oath to generate the totp token */
       oath_totp_generate(totp.secret, totp.secretlen, now, OATH_TOTP_DEFAULT_TIME_STEP_SIZE, OATH_TOTP_DEFAULT_START_TIME, 6, otp);
       oath_done();
 
-      gtk_entry_set_text(GTK_ENTRY(value_widget), otp);
+      gtk_entry_set_text(GTK_ENTRY(totp.field), otp);
 
       copy_button = gtk_button_new_with_mnemonic("_Copy");
       g_signal_connect(G_OBJECT(copy_button), "clicked",
@@ -99,10 +116,9 @@ static void process_single_field(
 
       refresh_button = gtk_button_new_with_mnemonic("_Refresh");
       g_signal_connect(G_OBJECT(refresh_button), "clicked",
-          G_CALLBACK(handle_refresh_button), value_widget);
-    }
-    else {
+          G_CALLBACK(handle_refresh_button), &test);
 
+      g_timeout_add(1000, handle_totp_refresh, &totp);
     }
 
     if(is_password) {
@@ -116,8 +132,10 @@ static void process_single_field(
     }
 
     gtk_grid_attach(GTK_GRID(container), label_widget, 0, row_index, 1, 1);
-    if(value_widget) {
-      gtk_grid_attach(GTK_GRID(container), value_widget, 1, row_index, copy_button == NULL ? 3 : 1, 1);
+    if(is_totp) {
+      gtk_grid_attach(GTK_GRID(container), totp.field, 1, row_index, copy_button == NULL ? 3 : 1, 1);
+    } else if (value_widget) {
+      gtk_grid_attach(GTK_GRID(container), value_widget, 1, row_index, copy_button == NULL? 3 : 1, 1);
     }
     if(copy_button) {
         gtk_grid_attach(GTK_GRID(container), copy_button, 2, row_index, 1, 1);
